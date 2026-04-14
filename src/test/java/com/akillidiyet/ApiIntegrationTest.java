@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.akillidiyet.repo.PasswordResetTokenRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
@@ -30,6 +31,55 @@ class ApiIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Test
+    void forgotAndResetPassword() throws Exception {
+        String email = "pw-" + System.nanoTime() + "@example.com";
+        String reg =
+                """
+                {"email":"%s","password":"password12","displayName":"PW"}
+                """
+                        .formatted(email);
+        mockMvc
+                .perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(reg))
+                .andExpect(status().isCreated());
+
+        mockMvc
+                .perform(
+                        post("/api/auth/forgot-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"email\":\"" + email + "\"}"))
+                .andExpect(status().isNoContent());
+
+        String token =
+                passwordResetTokenRepository
+                        .findFirstByUser_EmailIgnoreCaseOrderByIdDesc(email)
+                        .orElseThrow()
+                        .getToken();
+
+        mockMvc
+                .perform(
+                        post("/api/auth/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"token\":\""
+                                                + token
+                                                + "\",\"newPassword\":\"newpassword99\"}"))
+                .andExpect(status().isNoContent());
+
+        mockMvc
+                .perform(
+                        post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"email\":\""
+                                                + email
+                                                + "\",\"password\":\"newpassword99\"}"))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void foodsLogsAndCustomFoodFlow() throws Exception {
