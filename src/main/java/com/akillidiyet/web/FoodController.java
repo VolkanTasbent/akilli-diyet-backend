@@ -31,6 +31,12 @@ public class FoodController {
     private final CurrentUserService currentUserService;
     private final FoodCatalogService foodCatalogService;
 
+    @GetMapping("/mine")
+    public List<FoodResponse> listMine(@AuthenticationPrincipal AppUserDetails details) {
+        AppUser u = currentUserService.require(details);
+        return foodCatalogService.listMine(u);
+    }
+
     @GetMapping
     public List<FoodResponse> search(
             @AuthenticationPrincipal AppUserDetails details, @RequestParam(required = false, defaultValue = "") String q) {

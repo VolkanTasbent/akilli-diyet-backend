@@ -10,4 +10,6 @@ public record TrendRangeDto(
         LocalDate to,
         int targetCalories,
         double targetProteinG,
+        /** Profildeki hedef kilo (kg); grafik referansı için. */
+        Double targetWeightKg,
         List<TrendDayDto> days) {}

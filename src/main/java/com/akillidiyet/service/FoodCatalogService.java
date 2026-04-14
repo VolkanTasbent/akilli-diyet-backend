@@ -24,6 +24,13 @@ public class FoodCatalogService {
     private final FoodLogEntryRepository foodLogEntryRepository;
 
     @Transactional(readOnly = true)
+    public List<FoodResponse> listMine(AppUser user) {
+        return foodRepository.findByOwnerOrderByNameAsc(user).stream()
+                .map(f -> toDto(f, foodLogEntryRepository.countByFood_Id(f.getId()) > 0))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<FoodResponse> search(AppUser user, String q) {
         String term = q == null ? "" : q.trim();
         List<Food> global;
@@ -39,7 +46,7 @@ public class FoodCatalogService {
         merged.addAll(global);
         merged.addAll(mine);
         merged.sort(Comparator.comparing(Food::getName, String.CASE_INSENSITIVE_ORDER));
-        return merged.stream().limit(50).map(FoodCatalogService::toDto).toList();
+        return merged.stream().limit(50).map(f -> toDto(f, false)).toList();
     }
 
     @Transactional
@@ -55,7 +62,7 @@ public class FoodCatalogService {
                         .owner(owner)
                         .build();
         f = foodRepository.save(f);
-        return toDto(f);
+        return toDto(f, false);
     }
 
     @Transactional
@@ -73,7 +80,7 @@ public class FoodCatalogService {
         f.setCarbsPer100g(req.carbsPer100g());
         f.setFatPer100g(req.fatPer100g());
         f.setTablespoonGrams(req.tablespoonGrams());
-        return toDto(f);
+        return toDto(f, foodLogEntryRepository.countByFood_Id(f.getId()) > 0);
     }
 
     @Transactional
@@ -92,7 +99,7 @@ public class FoodCatalogService {
         foodRepository.delete(f);
     }
 
-    public static FoodResponse toDto(Food f) {
+    private static FoodResponse toDto(Food f, boolean usedInLogs) {
         return FoodResponse.builder()
                 .id(f.getId())
                 .name(f.getName())
@@ -102,6 +109,7 @@ public class FoodCatalogService {
                 .fatPer100g(f.getFatPer100g())
                 .tablespoonGrams(f.getTablespoonGrams())
                 .custom(f.getOwner() != null)
+                .usedInLogs(usedInLogs)
                 .build();
     }
 }

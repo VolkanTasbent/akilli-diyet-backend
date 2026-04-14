@@ -66,9 +66,16 @@ class ApiIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(createFood))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.custom").value(true))
+                               .andExpect(jsonPath("$.custom").value(true))
+                .andExpect(jsonPath("$.usedInLogs").value(false))
                 .andReturn();
         long customFoodId = objectMapper.readTree(foodRes.getResponse().getContentAsString()).get("id").asLong();
+
+        mockMvc
+                .perform(get("/api/foods/mine").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Ev yapımı bar"))
+                .andExpect(jsonPath("$[0].usedInLogs").value(false));
 
         String addLog =
                 """
@@ -83,6 +90,11 @@ class ApiIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(addLog))
                 .andExpect(status().isCreated());
+
+        mockMvc
+                .perform(get("/api/foods/mine").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].usedInLogs").value(true));
 
         MvcResult listRes = mockMvc
                 .perform(

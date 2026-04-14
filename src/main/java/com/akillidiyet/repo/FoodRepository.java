@@ -14,4 +14,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findTop50ByOwnerIsNullAndNameContainingIgnoreCaseOrderByNameAsc(String namePart);
 
     List<Food> findTop50ByOwnerAndNameContainingIgnoreCaseOrderByNameAsc(AppUser owner, String namePart);
+
+    List<Food> findByOwnerOrderByNameAsc(AppUser owner);
 }

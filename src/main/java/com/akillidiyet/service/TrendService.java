@@ -108,6 +108,7 @@ public class TrendService {
                 .to(to)
                 .targetCalories(targets.targetCalories())
                 .targetProteinG(targets.targetProteinG())
+                .targetWeightKg(user.getTargetWeightKg())
                 .days(days)
                 .build();
     }
