@@ -28,15 +28,20 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest req) {
-        if (userRepository.existsByEmailIgnoreCase(req.email())) {
+        String email = req.email() == null ? "" : req.email().trim().toLowerCase();
+        String displayName = req.displayName() == null ? "" : req.displayName().trim();
+        if (email.isBlank() || displayName.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-posta ve isim zorunludur");
+        }
+        if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bu e-posta zaten kayıtlı");
         }
         Instant now = Instant.now();
         AppUser u =
                 AppUser.builder()
-                        .email(req.email().trim().toLowerCase())
+                        .email(email)
                         .passwordHash(passwordEncoder.encode(req.password()))
-                        .displayName(req.displayName().trim())
+                        .displayName(displayName)
                         .dailyWaterGoalMl(2000)
                         .studentMode(false)
                         .createdAt(now)
