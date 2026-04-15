@@ -42,6 +42,9 @@ public class PasswordResetService {
     @Value("${app.mail.from:}")
     private String mailFrom;
 
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
     /** Her zaman aynı mesaj; e-posta varlığı sızdırılmaz. */
     @Transactional
     public void requestReset(String emailRaw) {
@@ -97,10 +100,14 @@ public class PasswordResetService {
     }
 
     private void sendOrLog(String to, String link) {
-        if (mailSender != null && mailFrom != null && !mailFrom.isBlank()) {
+        String fromAddress =
+                (mailFrom != null && !mailFrom.isBlank())
+                        ? mailFrom
+                        : (mailUsername == null ? "" : mailUsername);
+        if (mailSender != null && !fromAddress.isBlank()) {
             try {
                 SimpleMailMessage msg = new SimpleMailMessage();
-                msg.setFrom(mailFrom);
+                msg.setFrom(fromAddress);
                 msg.setTo(to);
                 msg.setSubject("Akıllı Diyet — şifre sıfırlama");
                 msg.setText(
@@ -113,7 +120,10 @@ public class PasswordResetService {
                 log.info("Şifre sıfırlama linki ({}): {}", to, link);
             }
         } else {
-            log.info("Şifre sıfırlama linki (e-posta yapılandırılmadı, alıcı={}): {}", to, link);
+            log.info(
+                    "Şifre sıfırlama linki (e-posta yapılandırılmadı; app.mail.from veya spring.mail.username yok, alıcı={}): {}",
+                    to,
+                    link);
         }
     }
 
