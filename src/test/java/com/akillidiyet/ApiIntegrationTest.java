@@ -186,6 +186,37 @@ class ApiIntegrationTest {
     }
 
     @Test
+    void patchReminderEmailPrefs() throws Exception {
+        String email = "rem-" + System.nanoTime() + "@example.com";
+        String regJson =
+                """
+                {"email":"%s","password":"password12","displayName":"Rem"}
+                """
+                        .formatted(email);
+        MvcResult reg = mockMvc
+                .perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(regJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String token = objectMapper.readTree(reg.getResponse().getContentAsString()).get("token").asText();
+
+        mockMvc
+                .perform(
+                        patch("/api/me")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"reminderEmailEnabled\":true,\"reminderEmailWater\":true,"
+                                                + "\"reminderEmailBreakfast\":true,\"reminderEmailLunch\":false,"
+                                                + "\"reminderEmailDinner\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reminderEmailEnabled").value(true))
+                .andExpect(jsonPath("$.reminderEmailWater").value(true))
+                .andExpect(jsonPath("$.reminderEmailBreakfast").value(true))
+                .andExpect(jsonPath("$.reminderEmailLunch").value(false))
+                .andExpect(jsonPath("$.reminderEmailDinner").value(true));
+    }
+
+    @Test
     void foodsRequiresAuth() throws Exception {
         mockMvc.perform(get("/api/foods")).andExpect(status().isForbidden());
     }

@@ -20,4 +20,9 @@ public record UserResponse(
         Integer goalDurationWeeks,
         String city,
         Boolean studentMode,
-        Integer dailyWaterGoalMl) {}
+        Integer dailyWaterGoalMl,
+        Boolean reminderEmailEnabled,
+        Boolean reminderEmailWater,
+        Boolean reminderEmailBreakfast,
+        Boolean reminderEmailLunch,
+        Boolean reminderEmailDinner) {}

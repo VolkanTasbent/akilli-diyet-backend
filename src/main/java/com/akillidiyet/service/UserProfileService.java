@@ -54,6 +54,21 @@ public class UserProfileService {
         if (req.dailyWaterGoalMl() != null) {
             user.setDailyWaterGoalMl(req.dailyWaterGoalMl());
         }
+        if (req.reminderEmailEnabled() != null) {
+            user.setReminderEmailEnabled(req.reminderEmailEnabled());
+        }
+        if (req.reminderEmailWater() != null) {
+            user.setReminderEmailWater(req.reminderEmailWater());
+        }
+        if (req.reminderEmailBreakfast() != null) {
+            user.setReminderEmailBreakfast(req.reminderEmailBreakfast());
+        }
+        if (req.reminderEmailLunch() != null) {
+            user.setReminderEmailLunch(req.reminderEmailLunch());
+        }
+        if (req.reminderEmailDinner() != null) {
+            user.setReminderEmailDinner(req.reminderEmailDinner());
+        }
         user.setUpdatedAt(Instant.now());
         userRepository.save(user);
         return UserMapper.toResponse(user);

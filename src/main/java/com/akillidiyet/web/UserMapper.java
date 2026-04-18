@@ -23,6 +23,11 @@ public class UserMapper {
                 .city(u.getCity())
                 .studentMode(u.getStudentMode())
                 .dailyWaterGoalMl(u.getDailyWaterGoalMl())
+                .reminderEmailEnabled(Boolean.TRUE.equals(u.getReminderEmailEnabled()))
+                .reminderEmailWater(Boolean.TRUE.equals(u.getReminderEmailWater()))
+                .reminderEmailBreakfast(Boolean.TRUE.equals(u.getReminderEmailBreakfast()))
+                .reminderEmailLunch(Boolean.TRUE.equals(u.getReminderEmailLunch()))
+                .reminderEmailDinner(Boolean.TRUE.equals(u.getReminderEmailDinner()))
                 .build();
     }
 }

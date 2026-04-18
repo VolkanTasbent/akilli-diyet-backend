@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -72,4 +73,32 @@ public class AppUser {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    /** Kayıtlı kullanıcıya zamanlanmış e-posta hatırlatmaları (SMTP gerekir). */
+    @Column(name = "reminder_email_enabled")
+    private Boolean reminderEmailEnabled;
+
+    @Column(name = "reminder_email_water")
+    private Boolean reminderEmailWater;
+
+    @Column(name = "reminder_email_breakfast")
+    private Boolean reminderEmailBreakfast;
+
+    @Column(name = "reminder_email_lunch")
+    private Boolean reminderEmailLunch;
+
+    @Column(name = "reminder_email_dinner")
+    private Boolean reminderEmailDinner;
+
+    @Column(name = "last_reminder_email_water_at")
+    private Instant lastReminderEmailWaterAt;
+
+    @Column(name = "last_reminder_email_breakfast_date")
+    private LocalDate lastReminderEmailBreakfastDate;
+
+    @Column(name = "last_reminder_email_lunch_date")
+    private LocalDate lastReminderEmailLunchDate;
+
+    @Column(name = "last_reminder_email_dinner_date")
+    private LocalDate lastReminderEmailDinnerDate;
 }
