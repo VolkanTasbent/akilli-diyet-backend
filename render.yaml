@@ -1,0 +1,9 @@
+# Render Blueprint (opsiyonel): repo kökünde bu dosya varsa Docker ile build eder.
+# Mevcut Web Service'i elle oluşturduysan: Build = Docker + Dockerfile yolu da olabilir.
+# Native Java + "Build Command" kullanıyorsan: ./mvnw clean package -DskipTests
+services:
+  - type: web
+    name: akilli-diyet-backend
+    runtime: docker
+    dockerfilePath: Dockerfile
+    healthCheckPath: /actuator/health

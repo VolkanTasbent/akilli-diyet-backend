@@ -1,0 +1,39 @@
+# Deploy: cd backend && fly launch --no-deploy
+# Neon JDBC (Connection details → JDBC): sslmode=require ekli URL kullan.
+# fly secrets set SPRING_DATASOURCE_URL='jdbc:postgresql://ep-.../neondb?sslmode=require' \
+#   SPRING_DATASOURCE_USERNAME='...' SPRING_DATASOURCE_PASSWORD='...' \
+#   JWT_SECRET='uzun-rastgele' APP_CORS_ORIGINS='https://senin-app.vercel.app' \
+#   APP_FRONTEND_BASE_URL='https://senin-app.vercel.app'
+# fly deploy
+# Ücretsiz planda min_machines_running=0 yapman gerekebilir.
+
+app = "akilli-diyet-api"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  SPRING_PROFILES_ACTIVE = "prod"
+  PORT = "8080"
+  APP_AVATAR_DIR = "/data/avatars"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  interval = "20s"
+  timeout = "5s"
+  grace_period = "30s"
+  method = "GET"
+  path = "/actuator/health"
+  protocol = "http"
+
+# Profil fotoğrafları kalıcı olsun: fly volumes create avatar_data --region fra --size 1
+# [[mounts]]
+#   source = "avatar_data"
+#   destination = "/data/avatars"

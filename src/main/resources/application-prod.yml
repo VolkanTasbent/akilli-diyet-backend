@@ -1,15 +1,38 @@
+# Fly.io + Neon: ortam değişkenleri ile (ör. fly secrets)
+# SPRING_DATASOURCE_URL=jdbc:postgresql://ep-xxx.region.aws.neon.tech/neondb?sslmode=require
+# SPRING_DATASOURCE_USERNAME=...
+# SPRING_DATASOURCE_PASSWORD=...
+# JWT_SECRET=...  APP_CORS_ORIGINS=https://senin-app.vercel.app
+# APP_FRONTEND_BASE_URL=https://senin-app.vercel.app
+# APP_AVATAR_DIR=/data/avatars  (volume veya makine içi dizin)
 spring:
-  config:
-    activate:
-      on-profile: prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   h2:
     console:
       enabled: false
 
-app:
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org.hibernate.orm.schema: INFO
+    org.hibernate.tool.schema: INFO

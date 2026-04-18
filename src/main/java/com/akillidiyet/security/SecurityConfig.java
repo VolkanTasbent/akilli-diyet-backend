@@ -39,6 +39,8 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers("/api/auth/**")
                                         .permitAll()
+                                        .requestMatchers("/actuator/health", "/actuator/health/**")
+                                        .permitAll()
                                         // BasicErrorController: korumalı olursa validasyon/409 cevapları 403'e düşer
                                         .requestMatchers("/error", "/error/**")
                                         .permitAll()
