@@ -36,17 +36,17 @@ public class FoodCatalogService {
         List<Food> global;
         List<Food> mine;
         if (term.length() < 2) {
-            global = foodRepository.findTop50ByOwnerIsNullOrderByNameAsc();
-            mine = foodRepository.findTop50ByOwnerOrderByNameAsc(user);
+            global = foodRepository.findByOwnerIsNullOrderByNameAsc();
+            mine = foodRepository.findByOwnerOrderByNameAsc(user);
         } else {
-            global = foodRepository.findTop50ByOwnerIsNullAndNameContainingIgnoreCaseOrderByNameAsc(term);
-            mine = foodRepository.findTop50ByOwnerAndNameContainingIgnoreCaseOrderByNameAsc(user, term);
+            global = foodRepository.findByOwnerIsNullAndNameContainingIgnoreCaseOrderByNameAsc(term);
+            mine = foodRepository.findByOwnerAndNameContainingIgnoreCaseOrderByNameAsc(user, term);
         }
         List<Food> merged = new ArrayList<>(global.size() + mine.size());
         merged.addAll(global);
         merged.addAll(mine);
         merged.sort(Comparator.comparing(Food::getName, String.CASE_INSENSITIVE_ORDER));
-        return merged.stream().limit(50).map(f -> toDto(f, false)).toList();
+        return merged.stream().map(f -> toDto(f, false)).toList();
     }
 
     @Transactional
