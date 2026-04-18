@@ -37,7 +37,16 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth ->
-                                auth.requestMatchers("/api/auth/**", "/h2-console/**")
+                                auth.requestMatchers("/api/auth/**")
+                                        .permitAll()
+                                        // BasicErrorController: korumalı olursa validasyon/409 cevapları 403'e düşer
+                                        .requestMatchers("/error", "/error/**")
+                                        .permitAll()
+                                        /*
+                                         * PathRequest.toH2Console() → H2ConsoleProperties bean ister.
+                                         * postgres profilinde h2.console.enabled=false olunca bean yok; tüm API 500 olur.
+                                         */
+                                        .requestMatchers("/h2", "/h2/**", "/h2-console", "/h2-console/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
@@ -49,14 +58,23 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}") String allowedOriginsRaw) {
+            @Value("${app.cors.allowed-origins:}") String allowedOriginsRaw) {
         CorsConfiguration c = new CorsConfiguration();
-        List<String> origins =
+        /*
+         * allowedOrigins ile sadece 5173/5174 ayrımı yapılamaz; Vite bazen 5174’e düşer → "Invalid CORS request".
+         * Pattern kullanarak lokal geliştirmede tüm portlara izin veriyoruz.
+         * Üretimde APP_CORS_ORIGINS ile tam köken(ler) ver (örn. https://app.example.com).
+         */
+        List<String> configured =
                 Arrays.stream(allowedOriginsRaw.split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
                         .toList();
-        c.setAllowedOrigins(origins.isEmpty() ? List.of("http://localhost:5173") : origins);
+        if (configured.isEmpty()) {
+            c.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
+        } else {
+            c.setAllowedOriginPatterns(configured);
+        }
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
         c.setAllowCredentials(true);

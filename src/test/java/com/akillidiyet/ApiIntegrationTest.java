@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.akillidiyet.repo.PasswordResetTokenRepository;
@@ -187,5 +188,31 @@ class ApiIntegrationTest {
     @Test
     void foodsRequiresAuth() throws Exception {
         mockMvc.perform(get("/api/foods")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void authApiGetRedirectsToFrontend() throws Exception {
+        mockMvc.perform(get("/api/auth/register")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("http://localhost:5173/register"));
+        mockMvc.perform(get("/api/auth/login")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("http://localhost:5173/login"));
+        mockMvc
+                .perform(get("/api/auth/reset-password").param("token", "abc/def"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:5173/reset-password?token=abc%2Fdef"));
+    }
+
+    @Test
+    void registerDuplicateEmailReturnsConflict() throws Exception {
+        String email = "dup-" + System.nanoTime() + "@example.com";
+        String body =
+                """
+                {"email":"%s","password":"password12","displayName":"Dup"}
+                """
+                        .formatted(email);
+        mockMvc
+                .perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isCreated());
+        mockMvc
+                .perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isConflict());
     }
 }

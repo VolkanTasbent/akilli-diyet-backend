@@ -2,7 +2,11 @@ spring:
   application:
     name: akilli-diyet-api
   datasource:
-    url: ${DATABASE_URL:jdbc:h2:mem:diyet;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE}
+    # Varsayılan: dosya tabanlı H2 (Docker Postgres değil). Konsolda birebir aynı JDBC kullan:
+    # jdbc:h2:file:<USER_HOME>/.akilli-diyet/h2/diyet;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
+    # Gerçek Postgres için: docker compose up -d  ardından SPRING_PROFILES_ACTIVE=postgres
+    # Tamamen geçici H2: DATABASE_URL=jdbc:h2:mem:diyet;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    url: ${DATABASE_URL:jdbc:h2:file:${user.home}/.akilli-diyet/h2/diyet;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE}
     username: ${DATABASE_USER:sa}
     password: ${DATABASE_PASSWORD:}
     driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
@@ -26,7 +30,8 @@ app:
     secret: ${JWT_SECRET:change-me-in-production-use-long-random-string-at-least-256-bits}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   cors:
-    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+    # Boş = geliştirme: http://localhost:* ve http://127.0.0.1:* (tüm portlar). Üretimde APP_CORS_ORIGINS zorunlu önerilir.
+    allowed-origins: ${APP_CORS_ORIGINS:}
   frontend:
     base-url: ${APP_FRONTEND_BASE_URL:http://localhost:5173}
   mail:
@@ -37,15 +42,20 @@ logging:
     org.hibernate.SQL: warn
 
 ---
+# Lokal Postgres (pgAdmin vb.): akilli_diyet, kullanıcı postgres; şifre ortamına göre (varsayılan 1).
+# Farklı şifre için: DB_PASSWORD=...   Docker ilk kurulumda compose ile aynı olmalı.
 spring:
   config:
     activate:
       on-profile: postgres
   datasource:
-    url: jdbc:postgresql://localhost:5432/akilli_diyet
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:akilli_diyet}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:1}
     driver-class-name: org.postgresql.Driver
+  h2:
+    console:
+      enabled: false
   jpa:
     properties:
       hibernate:
