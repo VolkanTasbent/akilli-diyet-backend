@@ -101,4 +101,11 @@ public class AppUser {
 
     @Column(name = "last_reminder_email_dinner_date")
     private LocalDate lastReminderEmailDinnerDate;
+
+    /** Örn. image/jpeg — null ise profil fotoğrafı yok. */
+    @Column(name = "avatar_media_type")
+    private String avatarMediaType;
+
+    @Column(name = "avatar_updated_at")
+    private Instant avatarUpdatedAt;
 }

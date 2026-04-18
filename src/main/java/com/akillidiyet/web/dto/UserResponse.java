@@ -3,6 +3,7 @@ package com.akillidiyet.web.dto;
 import com.akillidiyet.domain.ActivityLevel;
 import com.akillidiyet.domain.DietGoal;
 import com.akillidiyet.domain.Gender;
+import java.time.Instant;
 import lombok.Builder;
 
 @Builder
@@ -25,4 +26,6 @@ public record UserResponse(
         Boolean reminderEmailWater,
         Boolean reminderEmailBreakfast,
         Boolean reminderEmailLunch,
-        Boolean reminderEmailDinner) {}
+        Boolean reminderEmailDinner,
+        Boolean hasAvatar,
+        Instant avatarUpdatedAt) {}
