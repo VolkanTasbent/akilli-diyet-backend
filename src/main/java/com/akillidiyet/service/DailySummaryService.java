@@ -10,6 +10,7 @@ import com.akillidiyet.repo.ExerciseLogRepository;
 import com.akillidiyet.repo.FoodLogEntryRepository;
 import com.akillidiyet.repo.SleepLogRepository;
 import com.akillidiyet.repo.WaterLogRepository;
+import com.akillidiyet.service.dto.CoachMessageInput;
 import com.akillidiyet.service.dto.DailySummaryDto;
 import com.akillidiyet.service.dto.DailyTargetsDto;
 import com.akillidiyet.service.dto.DailyTaskDto;
@@ -97,14 +98,22 @@ public class DailySummaryService {
 
         List<String> coach =
                 coachService.buildCoachMessages(
-                        kcal,
-                        exerciseBurned,
-                        targets.targetCalories(),
-                        p,
-                        targets.targetProteinG(),
-                        waterMl,
-                        waterGoal,
-                        sleepHours);
+                        new CoachMessageInput(
+                                kcal,
+                                exerciseBurned,
+                                targets.targetCalories(),
+                                remaining,
+                                p,
+                                targets.targetProteinG(),
+                                c,
+                                targets.targetCarbsG(),
+                                f,
+                                targets.targetFatG(),
+                                waterMl,
+                                waterGoal,
+                                sleepHours,
+                                user.getDietGoal(),
+                                byMeal));
         List<String> sug = coachService.buildMacroSuggestions(targets, p);
 
         return DailySummaryDto.builder()
