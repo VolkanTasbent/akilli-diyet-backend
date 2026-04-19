@@ -11,6 +11,7 @@ public record FoodResponse(
         double carbsPer100g,
         double fatPer100g,
         Double tablespoonGrams,
+        Double sliceGrams,
         boolean custom,
         /** Günlük kayıtlarında kullanılıyorsa silinemez (yalnızca /mine listesinde anlamlı). */
         boolean usedInLogs) {}

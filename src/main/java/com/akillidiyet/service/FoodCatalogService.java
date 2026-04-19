@@ -59,6 +59,7 @@ public class FoodCatalogService {
                         .carbsPer100g(req.carbsPer100g())
                         .fatPer100g(req.fatPer100g())
                         .tablespoonGrams(req.tablespoonGrams())
+                        .sliceGrams(req.sliceGrams())
                         .owner(owner)
                         .build();
         f = foodRepository.save(f);
@@ -80,6 +81,7 @@ public class FoodCatalogService {
         f.setCarbsPer100g(req.carbsPer100g());
         f.setFatPer100g(req.fatPer100g());
         f.setTablespoonGrams(req.tablespoonGrams());
+        f.setSliceGrams(req.sliceGrams());
         return toDto(f, foodLogEntryRepository.countByFood_Id(f.getId()) > 0);
     }
 
@@ -108,6 +110,7 @@ public class FoodCatalogService {
                 .carbsPer100g(f.getCarbsPer100g())
                 .fatPer100g(f.getFatPer100g())
                 .tablespoonGrams(f.getTablespoonGrams())
+                .sliceGrams(f.getSliceGrams())
                 .custom(f.getOwner() != null)
                 .usedInLogs(usedInLogs)
                 .build();

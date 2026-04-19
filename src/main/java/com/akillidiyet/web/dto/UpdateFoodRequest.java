@@ -10,4 +10,5 @@ public record UpdateFoodRequest(
         double proteinPer100g,
         double carbsPer100g,
         double fatPer100g,
-        Double tablespoonGrams) {}
+        Double tablespoonGrams,
+        Double sliceGrams) {}

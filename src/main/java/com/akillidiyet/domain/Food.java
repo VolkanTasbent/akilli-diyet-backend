@@ -48,6 +48,10 @@ public class Food {
     @Column(name = "tablespoon_grams")
     private Double tablespoonGrams;
 
+    /** Ortalama 1 dilim kaç gram (ekmek vb.; yoksa null) */
+    @Column(name = "slice_grams")
+    private Double sliceGrams;
+
     /** Null: herkese açık seed besin; dolu: yalnızca bu kullanıcının özel besini */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id")
