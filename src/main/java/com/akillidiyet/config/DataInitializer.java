@@ -4,6 +4,7 @@ import com.akillidiyet.domain.Food;
 import com.akillidiyet.repo.FoodRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -18,14 +19,28 @@ public class DataInitializer {
     @Bean
     CommandLineRunner seedFoods() {
         return args -> {
-            List<Food> toSave = new ArrayList<>();
+            List<Food> toInsert = new ArrayList<>();
+            List<Food> toUpdate = new ArrayList<>();
             for (Food f : defaultCatalog()) {
-                if (!foodRepository.existsByOwnerIsNullAndNameIgnoreCase(f.getName())) {
-                    toSave.add(f);
+                Optional<Food> existing = foodRepository.findByOwnerIsNullAndNameIgnoreCase(f.getName());
+                if (existing.isEmpty()) {
+                    toInsert.add(f);
+                } else {
+                    Food e = existing.get();
+                    e.setCaloriesPer100g(f.getCaloriesPer100g());
+                    e.setProteinPer100g(f.getProteinPer100g());
+                    e.setCarbsPer100g(f.getCarbsPer100g());
+                    e.setFatPer100g(f.getFatPer100g());
+                    e.setTablespoonGrams(f.getTablespoonGrams());
+                    e.setSliceGrams(f.getSliceGrams());
+                    toUpdate.add(e);
                 }
             }
-            if (!toSave.isEmpty()) {
-                foodRepository.saveAll(toSave);
+            if (!toInsert.isEmpty()) {
+                foodRepository.saveAll(toInsert);
+            }
+            if (!toUpdate.isEmpty()) {
+                foodRepository.saveAll(toUpdate);
             }
         };
     }
@@ -104,7 +119,7 @@ public class DataInitializer {
                 food("Bal", 304, 0.3, 82, 0, 21.0),
                 food("Reçel (ortalama)", 260, 0.3, 65, 0.1, 18.0),
                 food("Çikolata (sütlü)", 535, 8, 59, 30, 8.0),
-                food("Çikolata (bitter, %70+)", 598, 7.8, 46, 43, 7.0),
+                food("Bitter çikolata (%70+)", 598, 7.8, 46, 43, 7.0),
                 food("Baklava (ortalama)", 430, 6, 50, 23, null),
                 food("Lokma", 330, 4, 45, 15, null),
                 food("Tulumba tatlısı", 360, 2, 52, 16, null),

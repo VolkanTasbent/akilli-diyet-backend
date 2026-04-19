@@ -3,6 +3,7 @@ package com.akillidiyet.repo;
 import com.akillidiyet.domain.AppUser;
 import com.akillidiyet.domain.Food;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
@@ -24,6 +25,8 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findByOwnerAndNameContainingIgnoreCaseOrderByNameAsc(AppUser owner, String namePart);
 
     boolean existsByOwnerIsNullAndNameIgnoreCase(String name);
+
+    Optional<Food> findByOwnerIsNullAndNameIgnoreCase(String name);
 
     long countByOwnerIsNull();
 }
